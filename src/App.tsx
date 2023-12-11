@@ -4,7 +4,7 @@ import TokenForm from './components/TokenForm';
 import { useRecoilState } from 'recoil';
 import { fetchErrorState, isTalkingState } from './store/atom';
 import RestartButton from './components/RestartButton';
-import LoadingBot from './components/LoadingBot.tsx';
+import LoadingBots from './components/LoadingBots.tsx';
 
 function App() {
   const [fetchError, _] = useRecoilState(fetchErrorState);
@@ -18,11 +18,7 @@ function App() {
     <React.Suspense
       fallback={
         <div className='flex h-screen items-center bg-slate-600 pb-24'>
-          <ul className='flex h-full w-full flex-row items-center justify-center gap-4'>
-            {botName.map((name, i) => (
-              <LoadingBot name={name} key={name} duration={(i + 1) * 500} />
-            ))}
-          </ul>
+          <LoadingBots />
         </div>
       }>
       <div className='relative flex h-screen items-center bg-slate-600 pb-24'>

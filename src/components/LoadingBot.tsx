@@ -1,22 +1,34 @@
 import { useEffect, useRef } from 'react';
 
-export default function LoadingBot({
-  name,
-  duration,
-}: {
+export interface Props {
   name: string;
-  duration: number;
-}) {
+  symbol: string;
+  startAt: number;
+}
+export default function LoadingBot({
+  name = 'raven 1',
+  symbol = 'raven',
+  startAt = 0,
+}: Props) {
   const pRef = useRef<HTMLParagraphElement>(null);
   const imgRef = useRef<HTMLSpanElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      pRef.current!.style.opacity = '100';
-      imgRef.current!.style.opacity = '100';
-    }, duration);
+    if (!pRef.current || !imgRef.current) return;
+    imgRef.current!.style.opacity = '1';
+
+    setTimeout(() => {
+      intervalRef.current = setInterval(() => {
+        pRef.current!.style.opacity =
+          pRef.current!.style.opacity === '1' ? '0' : '1';
+      }, 1000);
+    }, startAt);
 
     return () => {
-      clearTimeout(timeout);
+      imgRef.current!.style.opacity = '0';
+      pRef.current!.style.opacity = '0';
+      clearInterval(intervalRef.current!);
     };
   }, []);
 
@@ -30,7 +42,7 @@ export default function LoadingBot({
       <span
         className='material-symbols-outlined text-9xl  text-slate-900 opacity-50 duration-500'
         ref={imgRef}>
-        raven
+        {symbol}
       </span>
       <h1 className='inline-block text-slate-400'>{name}</h1>
     </li>
