@@ -1,92 +1,42 @@
-import { useRecoilState, useRecoilValue, useRecoilValueLoadable } from 'recoil';
-import {
-  commentSelector,
-  isTalkingState,
-  countSelector,
-  commentState,
-} from '@/store/atom';
-import { useEffect, useRef, useState } from 'react';
-
 import Bot from './Bot';
+import useGetRobots from '@/hooks/useGetRobots';
+import RestartButton from './RestartButton';
 
-interface Robot {
-  name: string;
-  comments: comment[];
-}
+import { atom, useRecoilState, useRecoilValue } from 'recoil';
+import LoadingBots from './LoadingBots';
+import { isTalkingState } from '@/store/atom';
 
-interface comment {
-  order: number;
-  message: string;
-}
+export const countState = atom({
+  key: 'count',
+  default: 0,
+});
 
-export default function Bots() {
-  const comments = ['hello', 'hi guys~', 'bye', 'see you', 'good bye'];
-  const [isTalking, setIsTalking] = useState(true);
-  const [count, setCount] = useState(0);
+export default function Bots({ initialMessage }: { initialMessage: string[] }) {
+  const [isError, robots, messageCount] = useGetRobots(initialMessage);
+  const count = useRecoilValue(countState);
 
-  const robots: Robot[] = [
-    { name: 'waga', comments: [] },
-    { name: 'woba', comments: [] },
-    { name: 'mogo', comments: [] },
-  ];
+  const isLoading = robots[0].comments.length === 0;
+  const isTalking = !isLoading && count < messageCount;
 
-  const commentsLength = comments.length;
-  const readingTimes: number[] = [];
-
-  comments.map((comment, commentIndex) => {
-    let robotIndex = 0;
-    while (
-      robots[robotIndex].comments.length > 0 &&
-      robots[robotIndex].comments[robots[robotIndex].comments.length - 1]
-        .order ===
-        commentIndex - 1
-    ) {
-      robotIndex = Math.floor(Math.random() * robots.length);
-    }
-    robots[robotIndex].comments.push({ order: commentIndex, message: comment });
-    readingTimes.push(calculateReadingSpeed(comment));
-  });
-
-  useEffect(() => {
-    if (!isTalking) return;
-    const timeout = setTimeout(
-      () => {
-        if (count >= commentsLength) {
-          setCount(commentsLength);
-          setIsTalking(false);
-        }
-        setCount(count + 1);
-      },
-      readingTimes[count] * 1000 + 1000,
-    );
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [count]);
-
+  console.log(isLoading, isError, isTalking);
   return (
     <ul className='flex h-full w-full flex-row items-center justify-center gap-4'>
-      {robots.map((robot) => {
-        return (
-          <Bot
-            key={robot.name}
-            count={isTalking ? count : commentsLength}
-            name={robot.name}
-            comments={robot.comments}
-            readingTime={readingTimes[count]}
-          />
-        );
-      })}
+      {isLoading && !isError && <LoadingBots />}
+      {isError && <p>Something went wrong</p>}
+      {!isLoading && !isError && !isTalking && <RestartButton />}
+      {!isLoading &&
+        robots.length > 0 &&
+        robots.map((robot) => {
+          console.log(robot);
+          return (
+            <Bot
+              key={robot.name}
+              count={count}
+              name={robot.name}
+              comments={robot.comments}
+            />
+          );
+        })}
     </ul>
   );
-}
-
-function calculateReadingSpeed(sentence: string) {
-  const wordsPerMinute = 200;
-  const words = sentence.split(' ');
-  const wordCount = words.length;
-  const readingTimeInMinutes = wordCount / wordsPerMinute;
-  const readingTimeInSeconds = readingTimeInMinutes * 60;
-  return readingTimeInSeconds;
 }

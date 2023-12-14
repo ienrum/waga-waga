@@ -1,18 +1,14 @@
 import DurationBubble from './DurationBubble';
 import Machine from './Machine';
+import { comment } from '@/hooks/useGetRobots';
 
 export interface Props {
   count: number;
   name: string;
   comments: comment[];
-  readingTime: number;
 }
 
-interface comment {
-  order: number;
-  message: string;
-}
-export default function Bot({ count, name, comments, readingTime }: Props) {
+export default function Bot({ count, name, comments }: Props) {
   const comment = comments.filter((comment) => comment.order === count)[0];
 
   return (
@@ -20,11 +16,11 @@ export default function Bot({ count, name, comments, readingTime }: Props) {
       {comment && (
         <DurationBubble
           message={comment.message}
-          duration={readingTime * 1000 + 1000}
+          duration={comment.time + 1000}
           order={count}
         />
       )}
-      <Machine name={name} symbol='raven' order={count} isTalking={!!comment} />
+      <Machine name={name} symbol='raven' isTalking={!!comment} order={count} />
     </li>
   );
 }

@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 export interface Props {
   name: string;
   symbol: string;
-  order?: number;
   isTalking?: boolean;
+  order: number;
 }
 
-const Machine = ({ name, symbol, order, isTalking }: Props) => {
+const Machine = ({ name, symbol, isTalking, order }: Props) => {
   const imgRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const Machine = ({ name, symbol, order, isTalking }: Props) => {
       imgRef.current.style.transform = 'translateY(0)';
       imgRef.current.style.rotate = '0deg';
     };
-  }, [imgRef, order]);
+  }, [imgRef, order, isTalking]);
 
   return (
     <>

@@ -1,9 +1,5 @@
 import { useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { fetchErrorState, fetchError } from '@/store/atom';
-
 export default function TokenForm() {
-  const [fetchError, setFetchError] = useRecoilState(fetchErrorState);
   const [input, setInput] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
