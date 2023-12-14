@@ -17,10 +17,14 @@ export const fetchErrorState = selector({
   key: 'fetchResultState',
   get: async ({ get }) => {
     get(fetchError);
-    const result = await fetchApi(SUBJECT_LIST[0]);
+    if (sessionStorage.getItem('auth') === 'true') {
+      return false;
+    }
+    const result = await fetchApi('test');
     if (result === 'error') {
       return true;
     }
+    sessionStorage.setItem('auth', 'true');
     return false;
   },
   set: ({ set }, newValue) => {
