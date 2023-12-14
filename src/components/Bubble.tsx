@@ -11,9 +11,17 @@ const Bubble = ({ message, isOn }: Props) => {
   useEffect(() => {
     if (!pRef.current) return;
     if (isOn) {
-      pRef.current.style.opacity = '1';
+      const timeout = setTimeout(() => {
+        if (!pRef.current) return;
+        pRef.current.style.opacity = '1';
+        clearTimeout(timeout);
+      }, 250);
     } else {
-      pRef.current.style.opacity = '0';
+      const timeout = setTimeout(() => {
+        if (!pRef.current) return;
+        pRef.current.style.opacity = '0';
+        clearTimeout(timeout);
+      }, 250);
     }
     return () => {
       if (!pRef.current) return;
