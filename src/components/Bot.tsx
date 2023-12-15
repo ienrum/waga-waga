@@ -1,6 +1,6 @@
 import DurationBubble from './DurationBubble';
 import Machine from './Machine';
-import { comment } from '@/hooks/makeRobots';
+import { comment } from '@/utils/makeRobots';
 
 export interface Props {
   count: number;

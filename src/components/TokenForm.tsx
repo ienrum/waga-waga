@@ -15,7 +15,7 @@ export default function TokenForm() {
   return (
     <div className='flex content-center gap-2'>
       <input
-        type='text'
+        type='password'
         className='flex-grow rounded-md'
         value={input}
         onChange={handleChange}
