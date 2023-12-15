@@ -1,8 +1,8 @@
 import { useSetRecoilState } from 'recoil';
-import { countSelector } from '@/store/atom';
+import { countState } from '@/components/Bots';
 
 export default function RestartButton() {
-  const setCount = useSetRecoilState(countSelector);
+  const setCount = useSetRecoilState(countState);
 
   return (
     <button

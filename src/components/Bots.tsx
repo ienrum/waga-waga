@@ -1,10 +1,11 @@
 import Bot from './Bot';
-import useGetRobots from '@/hooks/useGetRobots';
+import { Robot, makeRobots } from '@/hooks/makeRobots';
 import RestartButton from './RestartButton';
 
-import { atom, useRecoilState, useRecoilValue } from 'recoil';
+import { atom, useRecoilValue } from 'recoil';
 import LoadingBots from './LoadingBots';
-import { isTalkingState } from '@/store/atom';
+import { useEffect, useState } from 'react';
+import useGetMessageList from '@/hooks/useGetMessageList';
 
 export const countState = atom({
   key: 'count',
@@ -12,22 +13,30 @@ export const countState = atom({
 });
 
 export default function Bots({ initialMessage }: { initialMessage: string[] }) {
-  const [isError, robots, messageCount] = useGetRobots(initialMessage);
   const count = useRecoilValue(countState);
+  const [messageList, isError] = useGetMessageList(initialMessage, count === 0);
+  const messageCount = messageList.length;
 
-  const isLoading = robots[0].comments.length === 0;
+  const [robots, setRobots] = useState<Robot[] | null>(null);
+  useEffect(() => {
+    if (messageList.length > 0) {
+      setRobots(makeRobots(messageList));
+    }
+    return () => {
+      setRobots(null);
+    };
+  }, [messageList]);
+
+  const isLoading = robots === null;
   const isTalking = !isLoading && count < messageCount;
 
-  console.log(isLoading, isError, isTalking);
   return (
     <ul className='flex h-full w-full flex-row items-center justify-center gap-4'>
       {isLoading && !isError && <LoadingBots />}
       {isError && <p>Something went wrong</p>}
       {!isLoading && !isError && !isTalking && <RestartButton />}
       {!isLoading &&
-        robots.length > 0 &&
         robots.map((robot) => {
-          console.log(robot);
           return (
             <Bot
               key={robot.name}

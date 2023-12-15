@@ -2,12 +2,16 @@ import { useEffect, useState } from 'react';
 import { SUBJECT_LIST } from '@/store/subject-list';
 import { fetchApi } from '@/utils/fetchApi';
 
-const useGetMessageList = (initialValue: string[]): [string[], boolean] => {
+const useGetMessageList = (
+  initialValue: string[],
+  isFetch: boolean,
+): [string[], boolean] => {
   const [comments, setComments] = useState<string[]>([]);
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     let isLoading = false;
+    if (!isFetch) return;
     const fetchComments = async () => {
       try {
         isLoading = true;
@@ -30,7 +34,7 @@ const useGetMessageList = (initialValue: string[]): [string[], boolean] => {
     return () => {
       isLoading = false;
     };
-  }, []);
+  }, [isFetch]);
   return [comments ? comments : initialValue, isError];
 };
 
