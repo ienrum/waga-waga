@@ -1,14 +1,19 @@
 import { useRef } from 'react';
+import { countState } from './components/Bots';
 import TokenForm from './components/TokenForm';
-import { useRecoilState } from 'recoil';
+import { atom, useRecoilState, useRecoilValue } from 'recoil';
 import { fetchErrorState } from './store/atom';
 import Bots from './components/Bots.tsx';
 
+export const restartCountState = atom({
+  key: 'restartCount',
+  default: 0,
+});
+
 function App() {
   const [fetchError, _] = useRecoilState(fetchErrorState);
-  const count = useRef(0);
+  const count = useRecoilValue(restartCountState);
 
-  count.current += 1;
   return (
     <div className='flex h-screen w-screen flex-col items-center justify-center gap-8 bg-slate-600'>
       {fetchError && (
@@ -17,12 +22,7 @@ function App() {
           <TokenForm />
         </div>
       )}
-      {!fetchError && (
-        <Bots
-          key={count.current}
-          initialMessage={['hi', 'whats up?', 'nice to seeyah']}
-        />
-      )}
+      {!fetchError && <Bots key={count} initialMessage={[]} />}
     </div>
   );
 }
