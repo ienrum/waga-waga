@@ -1,5 +1,5 @@
 import Bot from './Bot';
-import { Robot, makeRobots } from '@/hooks/makeRobots';
+import { Robot, makeRobots } from '@/utils/makeRobots';
 import RestartButton from './RestartButton';
 
 import { atom, useRecoilValue } from 'recoil';
@@ -14,7 +14,8 @@ export const countState = atom({
 
 export default function Bots({ initialMessage }: { initialMessage: string[] }) {
   const count = useRecoilValue(countState);
-  const [messageList, isError] = useGetMessageList(initialMessage, count === 0);
+
+  const [messageList, isLoading, isError] = useGetMessageList(initialMessage);
   const messageCount = messageList.length;
 
   const [robots, setRobots] = useState<Robot[] | null>(null);
@@ -27,7 +28,6 @@ export default function Bots({ initialMessage }: { initialMessage: string[] }) {
     };
   }, [messageList]);
 
-  const isLoading = robots === null;
   const isTalking = !isLoading && count < messageCount;
 
   return (
@@ -36,7 +36,7 @@ export default function Bots({ initialMessage }: { initialMessage: string[] }) {
       {isError && <p>Something went wrong</p>}
       {!isLoading && !isError && !isTalking && <RestartButton />}
       {!isLoading &&
-        robots.map((robot) => {
+        robots?.map((robot) => {
           return (
             <Bot
               key={robot.name}
