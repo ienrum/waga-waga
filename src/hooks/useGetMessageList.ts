@@ -1,41 +1,31 @@
 import { useEffect, useState } from 'react';
 import { SUBJECT_LIST } from '@/store/subject-list';
 import { fetchApi } from '@/utils/fetchApi';
+import useAsync from './useAsync';
+import { CancelToken } from 'axios';
 
 const useGetMessageList = (
   initialValue: string[],
-  isFetch: boolean,
-): [string[], boolean] => {
-  const [comments, setComments] = useState<string[]>([]);
-  const [isError, setIsError] = useState(false);
+): [string[], boolean, boolean] => {
+  const [data, isLoading, isError] = useAsync(
+    (token: CancelToken) => fetchApi(getSubject(), token),
+    [],
+  );
+  const [messageList, setMessageList] = useState<string[] | null>(null);
 
   useEffect(() => {
-    let isLoading = false;
-    if (!isFetch) return;
-    const fetchComments = async () => {
-      try {
-        isLoading = true;
-        const id = getRandomInt(SUBJECT_LIST.length);
-        fetchApi(SUBJECT_LIST[id]).then((result) => {
-          if (!isLoading) return;
-          const filteredComments = filterComment(
-            result ? result.choices[0].message.content : '',
-          );
-          setComments(filteredComments);
-          isLoading = false;
-        });
-      } catch (e) {
-        console.log('useGetMessageList: ', e);
-        setIsError(true);
-      }
-    };
+    if (data) {
+      const result = filterComment(data);
+      setMessageList(result);
+    }
+  }, [data]);
 
-    fetchComments();
-    return () => {
-      isLoading = false;
-    };
-  }, [isFetch]);
-  return [comments ? comments : initialValue, isError];
+  return [messageList ? messageList : initialValue, isLoading, isError];
+};
+
+const getSubject = () => {
+  const subjectIndex = getRandomInt(SUBJECT_LIST.length);
+  return SUBJECT_LIST[subjectIndex];
 };
 
 const getRandomInt = (max: number) => {

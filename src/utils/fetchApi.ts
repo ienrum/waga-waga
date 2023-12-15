@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { CancelToken } from 'axios';
 
 const URL = 'https://api.openai.com/v1/chat/completions';
 
@@ -27,7 +28,10 @@ input: cute facts.
 output : ["Hello","Good morning~","What do you want to talk about today?","I'm actually cute","? Doesn't everyone know that?","Haha, you're a good joke teller~" ....].
 `;
 
-export const fetchApi = async (user_content: string) => {
+export const fetchApi = async (
+  user_content: string,
+  cancelToken: CancelToken,
+) => {
   try {
     const res = await axios({
       method: 'post',
@@ -53,11 +57,11 @@ export const fetchApi = async (user_content: string) => {
           },
         ],
       },
+      cancelToken: cancelToken,
     });
 
     return res.data;
   } catch (e) {
-    console.log(e);
-    return 'error';
+    throw e;
   }
 };
